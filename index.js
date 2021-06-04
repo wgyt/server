@@ -3,11 +3,14 @@ const app = express();
 app.use(express.json());
 const cors = require("cors");
 app.use(cors());
-require("dotenv").config();
-const jsoning = require("jsoning");
-var user = new jsoning("user.json");
+const jsoning = require("jsoning-no-limits");
+var user = new jsoning(".env");
 const fetch = require("node-fetch");
 const retronid = require("retronid");
+// keep
+app.get('/',(req,res)=>{
+	res.send('hiiiiiiiiiiiiiii')
+})
 // auth pages
 app.get("/auth", (req, res) => {
   res.redirect(
