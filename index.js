@@ -5,8 +5,7 @@ const cors = require("cors");
 app.use(cors());
 require("dotenv").config();
 const jsoning = require("jsoning");
-var status = new jsoning("status.json");
-var auth = new jsoning("auth.json");
+var user = new jsoning("user.json");
 const fetch = require("node-fetch");
 const retronid = require("retronid");
 // auth pages
@@ -17,10 +16,9 @@ app.get("/auth/callback", (req, res) => {
 	var response;
 	if (req.query.verified == 'true') {
 		retroid = retronid.generate();
-		res.send(`<h1>Welcome @${req.query.username}! Enter the following code in your client:</h1><br><h2>${retroid}</h2>`)
+		res.send(`<h1>Welcome @${req.query.username}! Enter the following code in your client, but <b><i>DO NOT SHARE IT</i></b>:</h1><br><h2>${retroid}</h2>`)
 		// welcome user
-		status.set(`${req.query.username}`,true);
-		auth.set(`${req.query.username}`, retroid);
+		user.set(`${req.query.username}`,{online:true,retroid:retroid});
 	} else {
 		res.redirect("/auth");
 	}
@@ -29,20 +27,16 @@ app.get("/auth/callback", (req, res) => {
 app.post("/api/v1/user/:user", async (req, res) => {
 	authtoken = req.body.retroid;
 	username = req.params.user;
-	if ((await auth.get(req.params.user)) === authtoken) {
-		status.set(`${req.params.user}`, req.body.online || false);
+	if ((await auth.get(req.params.user).retroid) === authtoken) {
+		user.set(`${req.params.username}`,{online:req.body.online,retroid:authtoken});
 		res.json({"ok":true});
 	} else {
 		res.json({"ok":false});
-		console.log("auth error");
 	}
 });
 app.get("/api/v1/user/:user", async (req, res) => {
 	json = await (await fetch(`https://my-ocular.jeffalo.net/api/user/${req.params.user}`)).json();
-	data = { status: await status.get(req.params.user), ocular: json };
+	data = { online: (await user.get(req.params.user)).online||false, ocular: json };
 	res.json(data);
-});
-app.get("/api/v1/users/", async (req, res) => {
-	res.json(await status.all());
 });
 app.listen(3000);
