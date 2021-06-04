@@ -18,6 +18,7 @@ app.get("/auth/callback", (req, res) => {
 	if (req.query.verified == 'true') {
 		retroid = retronid.generate();
 		res.send(`<h1>Welcome @${req.query.username}! Enter the following code in your client:</h1><br><h2>${retroid}</h2>`)
+		// welcome user
 		status.set(`${req.query.username}`,true);
 		auth.set(`${req.query.username}`, retroid);
 	} else {
