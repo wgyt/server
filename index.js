@@ -4,7 +4,7 @@ app.use(express.json());
 const cors = require("cors");
 app.use(cors());
 const jsoning = require("jsoning-no-limits");
-var user = new jsoning(".env");
+var user = new jsoning(".env/.json");
 const fetch = require("node-fetch");
 const retronid = require("retronid");
 // keep
@@ -14,10 +14,10 @@ app.get('/',(req,res)=>{
 // auth pages
 app.get("/auth", (req, res) => {
   res.redirect(
-    `https://scratch.auth.onedot.cf/?url=https://state.onedot.cf/auth/callback`
+    `https://scratch.auth.onedot.cf/?url=https://state.onedot.cf/authcallback`
   );
 });
-app.get("/auth/callback", (req, res) => {
+app.get("/authcallback", (req, res) => {
   var response;
   if (req.query.verified == "true") {
     retroid = retronid.generate();
@@ -31,6 +31,7 @@ app.get("/auth/callback", (req, res) => {
       online: true,
       retroid: retroid,
       richpresense: "",
+			richpresenseurl: "",
     });
   } else {
     res.redirect("/auth");
@@ -45,6 +46,7 @@ app.post("/api/v1/user/:user", async (req, res) => {
       online: req.body.online,
       retroid: authtoken,
       richpresense: req.body.richpresense || "",
+			richpresenseurl : req.body.richpresenseurl || "",
     });
     res.json({ ok: true });
   } else {
@@ -58,6 +60,7 @@ app.get("/api/v1/user/:user", async (req, res) => {
   data = {
     online: (await user.get(req.params.user)).online || false,
     richpresense: (await user.get(req.params.user)).richpresense || "",
+		richpresenseurl: (await user.get(req.params.user)).richpresenseurl || "",
     ocular: json,
   };
   res.json(data);
