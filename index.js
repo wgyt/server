@@ -4,7 +4,7 @@ app.use(express.json());
 const cors = require("cors");
 app.use(cors());
 const jsoning = require("jsoning-no-limits");
-var user = new jsoning(".env/db.json");
+const user = new jsoning(".env/db.json");
 const fetch = require("node-fetch");
 const retronid = require("retronid");
 // keep
